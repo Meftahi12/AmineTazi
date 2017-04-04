@@ -23,8 +23,10 @@ package com.navigation.drawer.activity.Activity.Profiles;
         import android.text.TextUtils;
         import android.util.Log;
         import android.view.Gravity;
+        import android.view.LayoutInflater;
         import android.view.View;
         import android.widget.Button;
+        import android.widget.CheckBox;
         import android.widget.ImageView;
         import android.widget.TextView;
         import android.widget.Toast;
@@ -32,6 +34,7 @@ package com.navigation.drawer.activity.Activity.Profiles;
         import com.navigation.drawer.activity.Activity.Alls.AllPharmaciesActivity;
         import com.navigation.drawer.activity.Activity.BaseActivity;
         import com.navigation.drawer.activity.Activity.FavorisActivity;
+        import com.navigation.drawer.activity.Activity.SearchActivity;
         import com.navigation.drawer.activity.Activity.TrackGPS;
         import com.navigation.drawer.activity.JSONParser;
         import com.navigation.drawer.activity.Activity.Main2Activity;
@@ -243,7 +246,10 @@ public class PharmacieProfil extends BaseActivity implements View.OnClickListene
 
                 if(curr.getId()==R.id.localPharmacie){
                     if(isNetworkAvailable()) {
-                        showSettingsAlert();
+                        if(SearchActivity.show)
+                            showSettingsAlert();
+                        else
+                            new MyTask().execute();
                     }
                     else Toast.makeText(getApplicationContext(),"connectez vous a internet et activez gps et reessayer",Toast.LENGTH_LONG).show();
                 }
@@ -454,7 +460,12 @@ public class PharmacieProfil extends BaseActivity implements View.OnClickListene
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
     public void showSettingsAlert() {
+        final CheckBox dontShowAgain;
+        LayoutInflater adbInflater = LayoutInflater.from(this);
+        View eulaLayout = adbInflater.inflate(R.layout.checkbox, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        dontShowAgain = (CheckBox) eulaLayout.findViewById(R.id.skip);
+        alertDialog.setView(eulaLayout);
         alertDialog.setTitle("Localiser un service medical");
 
         alertDialog.setMessage("Les localisations sont faites a l'aide du service google maps qui ne peux pas bien localiser parfois l'adresse demandée ... ce qui fait que les localisations ne sont pas bien précises");
@@ -462,12 +473,19 @@ public class PharmacieProfil extends BaseActivity implements View.OnClickListene
         alertDialog.setPositiveButton("Continuez quand même", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+                if (dontShowAgain.isChecked()) {
+                    SearchActivity.show = false ;
+                }
                 new MyTask().execute();
             }
+
         });
 
         alertDialog.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                if (dontShowAgain.isChecked()) {
+                    SearchActivity.show = false ;
+                }
                 dialog.cancel();
             }
         });

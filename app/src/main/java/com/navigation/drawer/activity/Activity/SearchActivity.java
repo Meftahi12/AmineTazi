@@ -23,6 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -58,7 +59,7 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
     Button search = null;
     ImageView addMedecin = null, addClinique = null, addPharmacie = null;
     public SQLiteDatabase myDB = null;
-
+    public static boolean show = true ;
     public boolean loginVerifed ;
     ProgressDialog pDialog;
     private TrackGPS gps;
@@ -222,7 +223,10 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
         if (v.getClass().getSimpleName().equals("ImageView")) {
             ImageView b = (ImageView) v;
             if (b.getId() == R.id.proche) {
-                showSettingsAlert();
+                if(SearchActivity.show)
+                    showSettingsAlert();
+                else
+                    new MyTask().execute();
             }
             if (b.getId() == R.id.getCliniques) {
                 AllCliniquesActivity.currentCateg = null ;
@@ -396,7 +400,12 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
         }
     }
     public void showSettingsAlert() {
+        final CheckBox dontShowAgain;
+        LayoutInflater adbInflater = LayoutInflater.from(this);
+        View eulaLayout = adbInflater.inflate(R.layout.checkbox, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        dontShowAgain = (CheckBox) eulaLayout.findViewById(R.id.skip);
+        alertDialog.setView(eulaLayout);
         alertDialog.setTitle("Localiser un service medical");
 
         alertDialog.setMessage("Les localisations sont faites a l'aide du service google maps qui ne peux pas bien localiser parfois l'adresse demandée ... ce qui fait que les localisations ne sont pas bien précises");
@@ -404,12 +413,19 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
         alertDialog.setPositiveButton("Continuez quand même", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+                if (dontShowAgain.isChecked()) {
+                    SearchActivity.show = false ;
+                }
                 new MyTask().execute();
             }
+
         });
 
         alertDialog.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+                if (dontShowAgain.isChecked()) {
+                    SearchActivity.show = false ;
+                }
                 dialog.cancel();
             }
         });
