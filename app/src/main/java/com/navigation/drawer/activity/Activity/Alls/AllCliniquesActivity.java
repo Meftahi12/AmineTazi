@@ -1,5 +1,7 @@
 package com.navigation.drawer.activity.Activity.Alls;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 import com.navigation.drawer.activity.Activity.BaseActivity;
 import com.navigation.drawer.activity.Activity.Main2Activity;
 import com.navigation.drawer.activity.Activity.Profiles.CliniqueProfil;
+import com.navigation.drawer.activity.Activity.SearchActivity;
 import com.navigation.drawer.activity.Blocs.CliniqueBloc;
 import com.navigation.drawer.activity.Classes.Clinique;
 import com.navigation.drawer.activity.R;
@@ -150,17 +153,19 @@ public class AllCliniquesActivity extends BaseActivity implements View.OnClickLi
 
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
-        int screenWidth = size.x;
-        int screenHeight = size.y;
+
+        double scale = getApplicationContext().getResources().getDisplayMetrics().density;
+        float nb =  getResources().getDimension(R.dimen.activity_horizontal_margin)*2 ;
+        float width = (float) (40 * scale + 0.5f + nb);
+        float screenWidth = size.x - width;
         int halfScreenWidth = (int)(screenWidth *0.5);
-        int quarterScreenWidth = (int)(halfScreenWidth * 0.5);
 
         for(int i=0;i<list.size();i++){
             Clinique clinique = list.get(i);
             GridLayout.LayoutParams param =new GridLayout.LayoutParams();
             param.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            param.width = halfScreenWidth - 120;
-            param.setMargins(10,10,10,10);
+            param.width = halfScreenWidth;
+            param.setMargins(5,5,5,5);
             param.setGravity(Gravity.CENTER_HORIZONTAL);
             CliniqueBloc gb = new CliniqueBloc(getApplicationContext(),clinique , param.width);
             gb.setOnClickListener(this);

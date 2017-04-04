@@ -1,8 +1,10 @@
 package com.navigation.drawer.activity.Activity.Profiles;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -238,7 +240,7 @@ public class MedecinProfil extends BaseActivity implements View.OnClickListener 
                 }
                 if (curr.getId() == R.id.localMedecin) {
                     if(isNetworkAvailable())
-                        new MyTask().execute();
+                        showSettingsAlert();
                     else
                         Toast.makeText(getApplicationContext(),"connectez vous a internet et activez gps et reessayer",Toast.LENGTH_LONG).show();
 
@@ -286,7 +288,7 @@ public class MedecinProfil extends BaseActivity implements View.OnClickListener 
 
                 int nbOfTry = 0 ;
                 Log.d("ha",gps.canGetLocation()+","+userlocatLa);
-                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <5) {
+                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <20) {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -315,7 +317,7 @@ public class MedecinProfil extends BaseActivity implements View.OnClickListener 
 
                 int nbOfTry = 0 ;
                 Log.d("ha",gps.canGetLocation()+","+userlocatLa);
-                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <5) {
+                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <20) {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -344,7 +346,7 @@ public class MedecinProfil extends BaseActivity implements View.OnClickListener 
 
                 int nbOfTry = 0 ;
                 Log.d("ha",gps.canGetLocation()+","+userlocatLa);
-                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <5) {
+                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <20) {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -371,7 +373,7 @@ public class MedecinProfil extends BaseActivity implements View.OnClickListener 
 
                 int nbOfTry = 0 ;
                 Log.d("ha",gps.canGetLocation()+","+userlocatLa);
-                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <5) {
+                while(gps.canGetLocation() && userlocatLa == -1 && nbOfTry <20) {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -430,5 +432,26 @@ public class MedecinProfil extends BaseActivity implements View.OnClickListener 
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Localiser un service medical");
+
+        alertDialog.setMessage("Les localisations sont faites a l'aide du service google maps qui ne peux pas bien localiser parfois l'adresse demandée ... ce qui fait que les localisations ne sont pas bien précises");
+
+        alertDialog.setPositiveButton("Continuez quand même", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                new MyTask().execute();
+            }
+        });
+
+        alertDialog.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog.show();
     }
 }

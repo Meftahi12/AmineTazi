@@ -1,8 +1,10 @@
 package com.navigation.drawer.activity.Activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -99,7 +101,6 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
 
         mDrawerList.setItemChecked(position, true);
         setTitle(listArray[position]);
-
 
         searchField = (EditText) findViewById(R.id.editText3);
 
@@ -221,7 +222,7 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
         if (v.getClass().getSimpleName().equals("ImageView")) {
             ImageView b = (ImageView) v;
             if (b.getId() == R.id.proche) {
-                new MyTask().execute() ;
+                showSettingsAlert();
             }
             if (b.getId() == R.id.getCliniques) {
                 AllCliniquesActivity.currentCateg = null ;
@@ -310,7 +311,7 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
             gps = new TrackGPS(SearchActivity.this);
             int nbOfTry = 0;
             Log.d("ha", gps.canGetLocation() + "," + userlocatLa);
-            while (gps.canGetLocation() && userlocatLa == -1 && nbOfTry < 5) {
+            while (gps.canGetLocation() && userlocatLa == -1 && nbOfTry < 20) {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -328,19 +329,18 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
             if (loginVerifed) {
                 if(isNetworkAvailable()) {
                     try {
-                            if (ListGarde.pharmacieList != null) {
-                                if (gps.canGetLocation()) {
-                                    if (userlocatLa == -1) {
-                                        pDialog.dismiss();
-                                        Toast toast = Toast.makeText(getApplicationContext(), "nous avons rencontré une erreur en détectant ta position courante ... reéssayer plus tard", Toast.LENGTH_SHORT);
-                                        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-                                        if (v != null) v.setGravity(Gravity.CENTER);
-                                        toast.show();
-                                    } else {
-                                        MapActivity.currentLocation = new Location("");
-                                        MapActivity.currentLocation.setLatitude(userlocatLa);
-                                        MapActivity.currentLocation.setLongitude(userlocatLn);
-
+                        if (ListGarde.pharmacieList != null) {
+                            if (gps.canGetLocation()) {
+                                if (userlocatLa == -1) {
+                                    pDialog.dismiss();
+                                    Toast toast = Toast.makeText(getApplicationContext(), "nous avons rencontré une erreur en détectant ta position courante ... reéssayer plus tard", Toast.LENGTH_SHORT);
+                                    TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                                    if (v != null) v.setGravity(Gravity.CENTER);
+                                    toast.show();
+                                } else {
+                                    MapActivity.currentLocation = new Location("");
+                                    MapActivity.currentLocation.setLatitude(userlocatLa);
+                                    MapActivity.currentLocation.setLongitude(userlocatLn);
                                         double dis = 1000000000;
                                         Pharmacie closer = null;
                                         Location currentLocation = MapActivity.currentLocation;
@@ -394,6 +394,27 @@ public class SearchActivity extends BaseActivity implements AdapterView.OnItemSe
             super.onProgressUpdate(values);
             pDialog.setMessage("Détection de ta position courante");
         }
+    }
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Localiser un service medical");
+
+        alertDialog.setMessage("Les localisations sont faites a l'aide du service google maps qui ne peux pas bien localiser parfois l'adresse demandée ... ce qui fait que les localisations ne sont pas bien précises");
+
+        alertDialog.setPositiveButton("Continuez quand même", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                new MyTask().execute();
+            }
+        });
+
+        alertDialog.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        alertDialog.show();
     }
 }
 

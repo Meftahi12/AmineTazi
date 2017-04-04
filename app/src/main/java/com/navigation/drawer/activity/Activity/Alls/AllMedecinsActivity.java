@@ -164,17 +164,19 @@ public class AllMedecinsActivity extends BaseActivity implements View.OnClickLis
 
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
-        int screenWidth = size.x;
-        int screenHeight = size.y;
+        double scale = getApplicationContext().getResources().getDisplayMetrics().density;
+        float nb =  getResources().getDimension(R.dimen.activity_horizontal_margin)*2 ;
+        float width = (float) (40 * scale + 0.5f + nb);
+        float screenWidth = size.x - width;
         int halfScreenWidth = (int)(screenWidth *0.5);
-        int quarterScreenWidth = (int)(halfScreenWidth * 0.5);
+
 
         for(int i=0;i<speciality.size();i++){
             Medecin medecin = speciality.get(i);
             GridLayout.LayoutParams param =new GridLayout.LayoutParams();
             param.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            param.width = halfScreenWidth - 120;
-            param.setMargins(10,10,10,10);
+            param.width = halfScreenWidth;
+            param.setMargins(5,5,5,5);
             param.setGravity(Gravity.CENTER_HORIZONTAL);
             medecinBloc gb = new medecinBloc(getApplicationContext(),medecin,param.width);
             gb.setOnClickListener(this);
